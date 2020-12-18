@@ -1,11 +1,12 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import Search from './components/Search';
+import StockPanel from './components/StockPanel';
 
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
-  const [stock, setStock] = useState({});
+  const [stock, setStock] = useState([]);
 
   const handleSearchInputKeyPress = event => {
     if (event.key === 'Enter') {
@@ -30,15 +31,18 @@ const App = () => {
     })
     const data = await response.json();
     setStock(data);
+    console.log(data);
     setLoading(false);
-    console.log(data.defaultKeyStatistics);
   }
 
+  //add logic to handle bad search
   useEffect(() => {
-    console.log(searchText);
+    let url;
     if (searchText) {
-      let url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${searchText}&region=US`;
+      url = `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-holders?symbol=${searchText}&region=US`;
       searchStock(url);
+    } else if (searchText === '') {
+      console.log('need to clean the ui')
     } else {
       console.log('no search value')
     }
@@ -51,8 +55,9 @@ const App = () => {
 
       <Search onKeyPress={handleSearchInputKeyPress} />
       <br></br>
-      <div>{loading ? <div>Your results will be displayed here</div> : <div>{JSON.stringify(stock)}</div>}</div>
-
+      {/* <div>{loading ? <div>Your results will be displayed here</div> : <div><h1>{JSON.stringify(stock)}</h1></div>}</div> */}
+      {/* <div>{loading ? <div>Your results will be displayed here</div> : <StockPanel stock={stock}></StockPanel>}</div> */}
+      <div>{loading ? <div>Your results will be displayed here</div> : <div>{stock.quoteType.longName}</div>}</div>
     </div>
   );
 }
